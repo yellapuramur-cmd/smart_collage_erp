@@ -28,7 +28,10 @@ const Login = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const user = await login(data.email, data.password);
+      const cleanEmail = data.email ? data.email.toLowerCase().trim() : '';
+      const cleanPassword = data.password ? data.password.trim() : '';
+      
+      const user = await login(cleanEmail, cleanPassword);
       toast.success(`Welcome back, ${user.name}!`);
       
       // Navigate to intended page or dashboard based on role

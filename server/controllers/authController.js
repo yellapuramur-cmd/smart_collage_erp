@@ -3,8 +3,10 @@ import { generateToken, ApiResponse } from '../utils/helpers.js';
 
 export const register = async (req, res, next) => {
   try {
-    const { name, email, password, role } = req.body;
+    let { name, email, password, role } = req.body;
     
+    if (email) email = email.toLowerCase().trim();
+
     let user = await User.findOne({ email });
     if (user) {
       return ApiResponse.error(res, 400, 'User already exists');
@@ -30,20 +32,24 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
 
     if (!email || !password) {
       return ApiResponse.error(res, 400, 'Please provide an email and password');
     }
 
+    // Sanitize email and password (trim whitespace, lowercase email)
+    email = email.toLowerCase().trim();
+    password = password.trim();
+
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
-      return ApiResponse.error(res, 401, 'Invalid credentials');
+      return ApiResponse.error(res, 401, 'Invalid email or password. Please verify your email.');
     }
 
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      return ApiResponse.error(res, 401, 'Invalid credentials');
+      return ApiResponse.error(res, 401, 'Invalid password. Please check your password.');
     }
 
     const token = generateToken(user._id, user.role);
@@ -89,18 +95,15 @@ export const updateProfile = async (req, res, next) => {
 
 export const forgotPassword = async (req, res, next) => {
   try {
-    // Basic stub, real implementation requires email sending
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ email: req.body.email?.toLowerCase().trim() });
     if (!user) {
       return ApiResponse.error(res, 404, 'There is no user with that email');
     }
 
     const resetToken = user.getResetPasswordToken();
     await user.save({ validateBeforeSave: false });
-
-    // Normally you'd use sendEmail helper here
     
-    ApiResponse.success(res, 200, 'Email sent');
+    ApiResponse.success(res, 200, 'Reset token generated');
   } catch (error) {
     next(error);
   }
@@ -108,7 +111,6 @@ export const forgotPassword = async (req, res, next) => {
 
 export const resetPassword = async (req, res, next) => {
   try {
-    // Verify token from params or body, then update password
     ApiResponse.success(res, 200, 'Password reset stub');
   } catch (error) {
     next(error);
