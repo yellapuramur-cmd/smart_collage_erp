@@ -25,19 +25,20 @@ import chatRoutes from './routes/chatRoutes.js';
 
 const app = express();
 
-// Set security headers
-app.use(helmet());
+// Enable security headers
+app.use(helmet({ contentSecurityPolicy: false }));
 
-// Enable CORS
+// Enable CORS for all origins
 app.use(cors({
-  origin: [
-    process.env.CLIENT_URL || 'http://localhost:5173',
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:5175',
-  ],
+  origin: true,
   credentials: true
 }));
+
+// Auto DB Connection Middleware
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 // Body parser
 app.use(express.json({ limit: '10mb' }));
@@ -46,7 +47,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 200
+  max: 300
 });
 app.use('/api', limiter);
 
@@ -68,20 +69,18 @@ app.use(`${apiPrefix}/chat`, chatRoutes);
 
 // Base route
 app.get('/', (req, res) => {
-  res.send('College ERP API is running...');
+  res.json({ message: 'College ERP API is running...', status: 'OK' });
 });
 
 // Error Handler Middleware
 app.use(errorHandler);
 
+// Standalone Server Execution
 const PORT = process.env.PORT || 5000;
-
-// Connect to DB first, then start server
-const startServer = async () => {
-  await connectDB();
+if (process.env.NODE_ENV !== 'production' || process.env.RUN_STANDALONE === 'true') {
   app.listen(PORT, () => {
     console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
   });
-};
+}
 
-startServer();
+export default app;

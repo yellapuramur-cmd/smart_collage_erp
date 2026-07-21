@@ -1,7 +1,14 @@
 import axios from 'axios';
 
-// Use explicit backend URL to avoid Vite proxy port mismatch (5173 vs 5174)
-const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+// Detect whether running locally or on Vercel live link
+const isLocalhost = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+// On localhost, default to http://localhost:5000/api/v1
+// On live Vercel deployment, default to relative /api/v1 (Vercel Serverless API)
+const defaultBaseUrl = isLocalhost ? 'http://localhost:5000/api/v1' : '/api/v1';
+
+const backendUrl = import.meta.env.VITE_API_URL || defaultBaseUrl;
 
 const api = axios.create({
   baseURL: backendUrl,
@@ -28,9 +35,8 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Only redirect to /login if 401 occurs and user is NOT already on the /login page
     if (error.response && error.response.status === 401) {
-      const isLoginPage = window.location.pathname === '/login';
+      const isLoginPage = typeof window !== 'undefined' && window.location.pathname === '/login';
       if (!isLoginPage) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
