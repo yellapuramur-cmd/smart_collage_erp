@@ -38,18 +38,18 @@ export const login = async (req, res, next) => {
       return ApiResponse.error(res, 400, 'Please provide an email and password');
     }
 
-    // Sanitize email and password (trim whitespace, lowercase email)
-    email = email.toLowerCase().trim();
-    password = password.trim();
+    // Sanitize email and password
+    email = String(email).toLowerCase().trim();
+    password = String(password).trim();
 
     const user = await User.findOne({ email }).select('+password');
-    if (!user) {
-      return ApiResponse.error(res, 401, 'Invalid email or password. Please verify your email.');
+    if (!user || !user.password) {
+      return ApiResponse.error(res, 401, 'Invalid email or password. Please verify your credentials.');
     }
 
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      return ApiResponse.error(res, 401, 'Invalid password. Please check your password.');
+      return ApiResponse.error(res, 401, 'Invalid email or password. Please verify your credentials.');
     }
 
     const token = generateToken(user._id, user.role);
@@ -61,10 +61,11 @@ export const login = async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        avatar: user.avatar
+        avatar: user.avatar || 'default.jpg'
       }
     });
   } catch (error) {
+    console.error('Login error:', error);
     next(error);
   }
 };

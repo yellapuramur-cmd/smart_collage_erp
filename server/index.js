@@ -25,20 +25,14 @@ import chatRoutes from './routes/chatRoutes.js';
 
 const app = express();
 
-// Enable security headers
+// Disable helmet CSP for smooth API execution
 app.use(helmet({ contentSecurityPolicy: false }));
 
-// Enable CORS for all origins
+// Enable CORS for all origins & credentials
 app.use(cors({
   origin: true,
   credentials: true
 }));
-
-// Auto DB Connection Middleware
-app.use(async (req, res, next) => {
-  await connectDB();
-  next();
-});
 
 // Body parser
 app.use(express.json({ limit: '10mb' }));
@@ -51,21 +45,26 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// Mount routers
-const apiPrefix = '/api/v1';
-app.use(`${apiPrefix}/auth`, authRoutes);
-app.use(`${apiPrefix}/students`, studentRoutes);
-app.use(`${apiPrefix}/faculty`, facultyRoutes);
-app.use(`${apiPrefix}/departments`, departmentRoutes);
-app.use(`${apiPrefix}/courses`, courseRoutes);
-app.use(`${apiPrefix}/subjects`, subjectRoutes);
-app.use(`${apiPrefix}/attendance`, attendanceRoutes);
-app.use(`${apiPrefix}/marks`, marksRoutes);
-app.use(`${apiPrefix}/assignments`, assignmentRoutes);
-app.use(`${apiPrefix}/fees`, feeRoutes);
-app.use(`${apiPrefix}/timetable`, timetableRoutes);
-app.use(`${apiPrefix}/dashboard`, dashboardRoutes);
-app.use(`${apiPrefix}/chat`, chatRoutes);
+// Helper function to mount routes on multiple path prefixes (Vercel Serverless compatibility)
+const mountRoutes = (prefix) => {
+  app.use(`${prefix}/auth`, authRoutes);
+  app.use(`${prefix}/students`, studentRoutes);
+  app.use(`${prefix}/faculty`, facultyRoutes);
+  app.use(`${prefix}/departments`, departmentRoutes);
+  app.use(`${prefix}/courses`, courseRoutes);
+  app.use(`${prefix}/subjects`, subjectRoutes);
+  app.use(`${prefix}/attendance`, attendanceRoutes);
+  app.use(`${prefix}/marks`, marksRoutes);
+  app.use(`${prefix}/assignments`, assignmentRoutes);
+  app.use(`${prefix}/fees`, feeRoutes);
+  app.use(`${prefix}/timetable`, timetableRoutes);
+  app.use(`${prefix}/dashboard`, dashboardRoutes);
+  app.use(`${prefix}/chat`, chatRoutes);
+};
+
+mountRoutes('/api/v1');
+mountRoutes('/v1');
+mountRoutes('/api');
 
 // Base route
 app.get('/', (req, res) => {
