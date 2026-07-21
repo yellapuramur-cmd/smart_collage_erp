@@ -15,9 +15,9 @@ const connectDB = async () => {
   const mongoUri = process.env.MONGODB_URI || FALLBACK_MONGODB_URI;
 
   const options = {
-    serverSelectionTimeoutMS: 30000,
-    connectTimeoutMS: 30000,
-    socketTimeoutMS: 30000,
+    serverSelectionTimeoutMS: 15000,
+    connectTimeoutMS: 15000,
+    socketTimeoutMS: 15000,
     family: 4, // Force IPv4
     tls: true,
     tlsInsecure: true, // Fix for SSL cert verification on Windows / Vercel
@@ -29,6 +29,7 @@ const connectDB = async () => {
     console.log('✅ MongoDB connected successfully');
   } catch (err) {
     console.error('❌ MongoDB Connection Error:', err.message);
+    throw new Error(`MongoDB Atlas Connection Failed: ${err.message}`);
   }
 };
 

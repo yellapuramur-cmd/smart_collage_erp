@@ -66,9 +66,32 @@ mountRoutes('/api/v1');
 mountRoutes('/v1');
 mountRoutes('/api');
 
+// Also mount directly at root level as fallback for serverless rewrites
+app.use('/auth', authRoutes);
+app.use('/students', studentRoutes);
+app.use('/faculty', facultyRoutes);
+app.use('/departments', departmentRoutes);
+app.use('/courses', courseRoutes);
+app.use('/subjects', subjectRoutes);
+app.use('/attendance', attendanceRoutes);
+app.use('/marks', marksRoutes);
+app.use('/assignments', assignmentRoutes);
+app.use('/fees', feeRoutes);
+app.use('/timetable', timetableRoutes);
+app.use('/dashboard', dashboardRoutes);
+app.use('/chat', chatRoutes);
+
 // Base route
 app.get('/', (req, res) => {
   res.json({ message: 'College ERP API is running...', status: 'OK' });
+});
+
+// Explicit 404 Route Handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Route Not Found - [${req.method}] ${req.originalUrl || req.url}`
+  });
 });
 
 // Error Handler Middleware
