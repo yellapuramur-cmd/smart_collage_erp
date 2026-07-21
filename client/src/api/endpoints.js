@@ -1,0 +1,82 @@
+export const ENDPOINTS = {
+  AUTH: {
+    LOGIN: '/auth/login',
+    REGISTER: '/auth/register',
+    ME: '/auth/me',
+    UPDATE_PROFILE: '/auth/update-profile',
+    FORGOT_PASSWORD: '/auth/forgot-password',
+    RESET_PASSWORD: '/auth/reset-password',
+    CHANGE_PASSWORD: '/auth/change-password',
+  },
+  STUDENTS: {
+    BASE: '/students',
+    BY_ID: (id) => `/students/${id}`,
+    BY_DEPARTMENT: (id) => `/students/department/${id}`,
+    BY_COURSE: (id) => `/students/course/${id}`,
+  },
+  FACULTY: {
+    BASE: '/faculty',
+    BY_ID: (id) => `/faculty/${id}`,
+  },
+  DEPARTMENTS: {
+    BASE: '/departments',
+    BY_ID: (id) => `/departments/${id}`,
+  },
+  COURSES: {
+    BASE: '/courses',
+    BY_ID: (id) => `/courses/${id}`,
+  },
+  SUBJECTS: {
+    BASE: '/subjects',
+    BY_ID: (id) => `/subjects/${id}`,
+  },
+  ATTENDANCE: {
+    MARK: '/attendance/mark',
+    BY_STUDENT: (id) => `/attendance/student/${id}`,
+    BY_SUBJECT: (id) => `/attendance/subject/${id}`,
+    REPORT: '/attendance/report',
+    MY: '/attendance/my',
+  },
+  MARKS: {
+    UPLOAD: '/marks/upload',
+    BY_STUDENT: (id) => `/marks/student/${id}`,
+    BY_SUBJECT: (id) => `/marks/subject/${id}`,
+    MY: '/marks/my',
+    REPORT: '/marks/report',
+  },
+  ASSIGNMENTS: {
+    BASE: '/assignments',
+    BY_ID: (id) => `/assignments/${id}`,
+    SUBMIT: (id) => `/assignments/${id}/submit`,
+    SUBMISSIONS: (id) => `/assignments/${id}/submissions`,
+    GRADE: (submId) => `/assignments/submissions/${submId}/grade`,
+    MY: '/assignments/my',
+  },
+  FEES: {
+    BASE: '/fees',
+    BY_ID: (id) => `/fees/${id}`,
+    PAYMENT: '/fees/payment',
+    PAYMENT_HISTORY: (id) => `/fees/${id}/history`,
+    MY: '/fees/my',
+    MY_PAYMENTS: '/fees/my-payments',
+  },
+  TIMETABLE: {
+    BASE: '/timetable',
+    BY_ID: (id) => `/timetable/${id}`,
+    BY_COURSE: (courseId) => `/timetable/course/${courseId}`,
+    BY_FACULTY: (facId) => `/timetable/faculty/${facId}`,
+    MY: '/timetable/my',
+    GENERATE: '/timetable/generate',
+  },
+  DASHBOARD: {
+    ADMIN: '/dashboard/admin',
+    FACULTY: '/dashboard/faculty',
+    STUDENT: '/dashboard/student',
+    ANALYTICS: '/dashboard/analytics',
+  },
+  CHAT: {
+    SEND: '/chat/send',
+    HISTORY: '/chat/history',
+    CLEAR: '/chat/clear',
+  },
+};
