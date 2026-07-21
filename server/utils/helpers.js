@@ -4,14 +4,17 @@ import cloudinary from '../config/cloudinary.js';
 import streamifier from 'streamifier';
 
 /**
- * Generate JWT token
+ * Generate JWT token with safe fallbacks for Vercel Serverless
  * @param {String} id 
  * @param {String} role 
  * @returns {String} token
  */
 export const generateToken = (id, role) => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE
+  const secret = process.env.JWT_SECRET || 'college-erp-jwt-super-secret-key-2026';
+  const expire = process.env.JWT_EXPIRE || '7d';
+  
+  return jwt.sign({ id, role }, secret, {
+    expiresIn: expire
   });
 };
 
@@ -21,8 +24,8 @@ export const generateToken = (id, role) => {
  */
 export const sendEmail = async (options) => {
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: process.env.SMTP_PORT || 587,
     secure: false,
     auth: {
       user: process.env.SMTP_USER,
@@ -31,7 +34,7 @@ export const sendEmail = async (options) => {
   });
 
   const message = {
-    from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
+    from: `${process.env.FROM_NAME || 'Smart College ERP'} <${process.env.FROM_EMAIL || 'noreply@erp.com'}>`,
     to: options.email,
     subject: options.subject,
     html: options.message
